@@ -118,6 +118,10 @@ class Vec:
     def normalize(self):
         return self / self.size()
 
+    def rotate90(self):
+        assert self.dim() == 2
+        return Vec(self.y, -self.x)
+
 
 def dot(v1, v2):
     res = 0

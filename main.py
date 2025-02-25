@@ -1,5 +1,6 @@
 from View import *
 from inputs import *
+import pygame as pg
 
 
 inputs = Inputs()
@@ -9,7 +10,7 @@ heights = [[0, 0, 1, 1, 1, 2, 3, 4],
            [0, 1, 1, 1, 1, 1, 2, 2],
            [0, 1, 1, 1, 1, 1, 2, 1],
            [0, 0, 1, 1, 1, 1, 1, 2],
-           [1, 0, 1, 1, 1, 1, 1, 1],
+           [0, 0, 1, 1, 1, 1, 1, 1],
            [0, 0, 1, 0, 0, 1, 0, 1],
            [0, 0, 0, 0, 0, 0, 0, 0]]
 
@@ -22,7 +23,15 @@ while not inputs.quit:
     inputs.update()
     view.draw_terrain(heights, colors)
     view.flip()
-    view.engine.lights[0].pos += Vec(0, 0, 0.01)
+    #view.engine.lights[0].pos += Vec(0, 0, 0.01)
+    if inputs.holding(pg.K_RIGHT):
+        view.engine.lights[0].pos += Vec(0.5, -0.5, 0) * 1/2
+    if inputs.holding(pg.K_LEFT):
+        view.engine.lights[0].pos += Vec(-0.5, 0.5, 0) * 1/2
+    if inputs.holding(pg.K_UP):
+        view.engine.lights[0].pos += Vec(-0.5, -0.5, 0) * 1/2
+    if inputs.holding(pg.K_DOWN):
+        view.engine.lights[0].pos += Vec(0.5, 0.5, 0) * 1/2
     clock.tick(30)
 
 pg.quit()
