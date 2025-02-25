@@ -7,6 +7,8 @@ class View:
         self.screenSize = Vec(1100, 700)
         self.screen = pg.display.set_mode(self.screenSize.get())
         self.engine = ViewEngine(self.screenSize)
+        self.engine.add_point_light(Vec(1, 1, -3), Vec(1, 1, 1))
+        self.engine.set_light_color(Vec(0, 0, 0))
 
     def bg(self):
         self.screen.fill(0)
@@ -19,7 +21,7 @@ class View:
 
     def draw_quad_3d(self, v1, v2, v3, v4, color=Vec(255, 255, 255), width=0, light=True):
         if light:
-            color = self.engine.color((v1+v2+v3+v4)/4, cross(v2-v1, v3-v1), color)
+            color = self.engine.color((v1+v2+v3+v4)/4, -cross(v2-v1, v3-v1), color)
         pg.draw.polygon(self.screen, color.get(), (
             self.engine.to_screen(v1).get(),
             self.engine.to_screen(v2).get(),
@@ -49,8 +51,10 @@ class View:
         self.draw_quad_3d(v1, v2, v3, v4, color, width)
 
     def draw_terrain(self, heights, colors):
-        for i in range(len(heights)):
-            for j in range(len(heights[i])):
+        for light in self.engine.lights:
+            self.draw_point_3d(light.pos)
+        for i in (range(len(heights))):
+            for j in (range(len(heights[i]))):
                 self.draw_quad_hor_3d(Vec(i, j), Vec(i+1, j+1), heights[i][j], colors[i][j])
 
     @staticmethod

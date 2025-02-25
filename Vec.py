@@ -20,6 +20,22 @@ class Vec:
     @property
     def w(self): return self.v[3]
 
+    @property
+    def r(self):
+        return self.v[0]
+
+    @property
+    def g(self):
+        return self.v[1]
+
+    @property
+    def b(self):
+        return self.v[2]
+
+    @property
+    def a(self):
+        return self.v[3]
+
     def get(self):
         return self.v
 
