@@ -2,7 +2,7 @@ from Vec import *
 
 
 class PointLight:
-    def __init__(self, pos: Vec, color: Vec, power=0.8):
+    def __init__(self, pos: Vec, color: Vec, power=1):
         self.pos = pos
         self.color = color
         self.power = power

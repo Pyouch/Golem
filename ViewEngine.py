@@ -10,7 +10,7 @@ class ViewEngine:
         self.base[0] = self.base_matrix * Vec(1, 0, 0) * 40
         self.base[1] = self.base_matrix * Vec(0, 1, 0) * 40
         self.base[2] = self.base_matrix * Vec(0, 0, 1) * 40
-        self.matrix = Matrix(self.base[0], self.base[1], ZERO3).transpose()
+        self.matrix = Matrix(self.base[0], self.base[1], self.base[2]).transpose()
         self.screen_size = screen_size
 
         self.light_direction = Vec(1, 1, 1).normalize()
@@ -18,6 +18,12 @@ class ViewEngine:
 
         self.lights = []
 
+    def change_base(self, matrix):
+        self.base_matrix = matrix
+        self.base[0] = self.base_matrix * Vec(1, 0, 0) * 40
+        self.base[1] = self.base_matrix * Vec(0, 1, 0) * 40
+        self.base[2] = self.base_matrix * Vec(0, 0, 1) * 40
+        self.matrix = Matrix(self.base[0], self.base[1], ZERO3).transpose()
     def set_light_direction(self, v: Vec):
         assert v.dim() == 3
         self.light_direction = v.normalize()
@@ -31,6 +37,11 @@ class ViewEngine:
 
     def to_screen(self, v):
         return (self.matrix * v)["xy"] + self.screen_size / 2
+
+    def cam_dist(self, pos):
+        return (self.matrix * pos).z
+
+
 
     def color(self, pos, normal, color):
         return self._intensity(pos, normal) * color
