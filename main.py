@@ -2,13 +2,19 @@ from View import *
 from inputs import *
 import pygame as pg
 from perlin_noise import PerlinNoise
-
-noise = PerlinNoise(10, 1)
-
+from random import random
 
 
 inputs = Inputs()
 view = View()
+
+
+def generate_terrain(size, relief=10, octaves=5, seed=None):
+    if seed is None:
+        seed = 1
+    noise = PerlinNoise(octaves, seed)
+    return [[int(noise((i/size, j/size))*relief) for j in range(size)] + [relief] for i in range(size)] + [[relief] * size]
+
 
 heights = [[0, 0, 1, 1, 1, 2, 2, 2, 10],
            [0, 1, 1, 1, 1, 1, 2, 2, 10],
@@ -19,6 +25,8 @@ heights = [[0, 0, 1, 1, 1, 2, 2, 2, 10],
            [0, 0, 0, 0, 0, 0, 0, 0, 10],
            [10, 10, 10, 10, 10, 10, 10, 10, 10]]
 
+
+heights = generate_terrain(20, seed=random())
 
 colors = [[Vec(20, 255, 20) for _ in range(len(heights[i]))] for i in range(len(heights))]
 clock = pg.time.Clock()

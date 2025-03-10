@@ -24,6 +24,7 @@ class ViewEngine:
         self.base[1] = self.base_matrix * Vec(0, 1, 0) * 40
         self.base[2] = self.base_matrix * Vec(0, 0, 1) * 40
         self.matrix = Matrix(self.base[0], self.base[1], ZERO3).transpose()
+
     def set_light_direction(self, v: Vec):
         assert v.dim() == 3
         self.light_direction = v.normalize()
