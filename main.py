@@ -45,6 +45,10 @@ while not inputs.quit:
         view.engine.lights[0].pos += Vec(-0.5, -0.5, 0) * 1/2
     if inputs.holding(pg.K_DOWN):
         view.engine.lights[0].pos += Vec(0.5, 0.5, 0) * 1/2
+    if inputs.holding(pg.K_SPACE):
+        view.engine.lights[0].pos += Vec(0, 0, -0.5) * 1/2
+    if inputs.holding(pg.K_LSHIFT):
+        view.engine.lights[0].pos += Vec(0, 0, 0.5) * 1/2
     clock.tick(30)
 
 pg.quit()

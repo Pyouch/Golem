@@ -9,6 +9,8 @@ class PointLight:
 
     def apply(self, v, normal: Vec):
         """ We suppose that normal is normalized """
-        d = self.pos - v
-        return self.color * max(dot(normal, d), 0) / max(d.size()/self.power, 1)
+        d = (self.pos - v)
+        length = d.size()
+        d = d.normalize()
+        return self.color * max(dot(normal, d), 0) / max(length/self.power, 1)
 

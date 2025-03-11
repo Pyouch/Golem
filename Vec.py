@@ -116,7 +116,10 @@ class Vec:
         return sqrt(dot(self, self))
 
     def normalize(self):
-        return self / self.size()
+        s = self.size()
+        if s == 0:
+            return Vec(*self.v)
+        return self / s
 
     def rotate90(self):
         assert self.dim() == 2
