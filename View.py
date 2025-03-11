@@ -14,22 +14,6 @@ class View:
     def bg(self):
         self.screen.fill(0)
 
-    def draw_point_3d(self, vec, color=Vec(255, 255, 255)):
-        pg.draw.circle(self.screen, color.get(), self.engine.to_screen(vec).get(), 3)
-
-    def draw_line_3d(self, v1, v2, color=Vec(255, 255, 255)):
-        pg.draw.line(self.screen, color.get(), self.engine.to_screen(v1).get(), self.engine.to_screen(v2).get())
-
-    def draw_quad_3d(self, v1, v2, v3, v4, color=Vec(255, 255, 255), width=0, light=True):
-        if light:
-            color = self.engine.color((v1+v2+v3+v4)/4, -cross(v2-v1, v3-v1), color)
-        pg.draw.polygon(self.screen, color.get(), (
-            self.engine.to_screen(v1).get(),
-            self.engine.to_screen(v2).get(),
-            self.engine.to_screen(v3).get(),
-            self.engine.to_screen(v4).get()
-        ), width)
-
     def draw_terrain(self, heights, colors):
         corners = Vec(1, 0), Vec(0, 1)
         for i in (range(len(heights))):
