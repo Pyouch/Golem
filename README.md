@@ -51,6 +51,7 @@ The Shine is the reflection on shiny surfaces.
 
 #### For the 3D engine
 
+- Transform in 4D vectors
 - Move the camera
 - Make gradients (is it possible to do it easily with pygame ?)
 - Shine from Phong model (for the lights)
