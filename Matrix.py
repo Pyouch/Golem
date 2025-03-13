@@ -1,31 +1,29 @@
 from Vec import Vec, dot
 from math import sqrt, cos, sin, pi
-
+import numpy as np
 
 class Matrix:
     def __init__(self, *args):
-        self.mat = []
+        self.mat = np.array([])
         if isinstance(args[0], int) or isinstance(args[0], float):
             size = int(sqrt(len(args)))
-            self.mat = [[0 for _ in range(size)] for _ in range(size)]
-            for j in range(size):
-                for i in range(size):
-                    self.mat[j][i] = args[i+j*size]
-
+            self.mat = np.array(args)
+            self.mat.shape = (size, size)
+            
         elif isinstance(args[0], Vec):
             size = len(args)
-            self.mat = [[0 for _ in range(size)] for _ in range(size)]
-            for j in range(size):
-                for i in range(size):
-                    self.mat[j][i] = args[i][j]
+            self.mat = np.array(args)
+            self.mat.shape = (size, size)
+            self.mat = np.transpose(self.mat)
+
         elif isinstance(args[0], list) and len(args) == 1:
-            self.mat = args[0]
+            self.mat = np.array((args[0]))
+
         elif isinstance(args[0], list):
             size = len(args)
-            self.mat = [[0 for _ in range(size)] for _ in range(size)]
-            for j in range(size):
-                for i in range(size):
-                    self.mat[j][i] = args[j][i]
+            self.mat = np.array(args)
+            self.mat.shape = (size, size)
+            
 
     def dim(self):
         return len(self.mat)
@@ -50,11 +48,7 @@ class Matrix:
         return str(self.mat)
 
     def transpose(self):
-        mat = [[0 for _ in range(self.dim())] for _ in range(self.dim())]
-        for i in range(self.dim()):
-            for j in range(self.dim()):
-                mat[i][j] = self.mat[j][i]
-        return Matrix(mat)
+        return np.transpose(self.mat)
 
     @classmethod
     def rotation_x(cls, theta):
@@ -74,7 +68,7 @@ if __name__ == "__main__":
     print(m)
     print(m.transpose())
 
-    m = Matrix(1, 2, 3, 4)
+    """m = Matrix(1, 2, 3, 4)
     print(m * m)
 
     m1 = Matrix.rotation_x(-pi / 4)
@@ -83,4 +77,4 @@ if __name__ == "__main__":
     print(m2)
     print(m2 * m1 * Vec(1, 0, 0))
     print(m2 * m1 * Vec(0, 1, 0))
-    print(m2 * m1 * Vec(0, 0, 1))
+    print(m2 * m1 * Vec(0, 0, 1))"""
