@@ -48,7 +48,7 @@ class Vec:
             return self.v[item]
         if isinstance(item, str):
             coordinates = {"x": 0, "y": 1, "z": 2, "w": 3, "r": 0, "g": 1, "b": 2, "a": 3, "0": None}
-            v =  np.array()
+            v =  np.array([])
             for e in item:
                 assert e in coordinates, f"{e} is not a coordinate"
                 if e == "0":
@@ -139,7 +139,13 @@ class Vec:
 
 
 def dot(v1, v2):
-    return v1.get()*v2.get()
+    res = 0
+    v1 = v1.get()
+    v2 = v2.get()
+    assert len(v1) == len(v2)
+    for i in range(len(v1)):
+        res += v1[i] * v2[i]
+    return res
 
 
 def cross(v1, v2):
@@ -170,10 +176,11 @@ FORWARD3 = Vec(0, 1, 0)
 BACKWARD3 = Vec(0, -1, 0)
 
 if __name__=="__main__":
-    test = Vec(0,0)
-    print(test.dim())
+    test = Vec(2,3)
+    #print(test.dim())
     test.add_dim(1)
-    print(test.dim(), test)
-    test.remove_dim()
-    print(test.dim(), test)
+    #print(test.dim(), test)
+    #test.remove_dim()
+    #print(test.dim(), test)
+    print(dot(test, test))
     
