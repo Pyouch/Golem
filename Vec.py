@@ -4,7 +4,7 @@ import numpy as np
 
 class Vec:
     def __init__(self, *args):
-        self.v = np.array(args)
+        self.v = np.array(elt for elt in args)
 
     def dim(self):
         return len(self.v)
