@@ -31,7 +31,12 @@ class Matrix:
 
     def __mul__(self, other):
         """Do the matrix product between self and other"""
-        return np.dot(self.mat, other.mat)
+        if isinstance(other, Matrix):
+            res = np.dot(self.mat, other.mat)
+            return Matrix(res)
+        elif isinstance(other, Vec):
+            res = np.dot(self.mat, other)
+            return Vec(*res)
 
 
     def __str__(self):
