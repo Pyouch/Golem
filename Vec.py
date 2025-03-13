@@ -1,4 +1,5 @@
 from math import sqrt
+from numpy import array, matrix
 
 
 class Vec:
@@ -22,14 +23,17 @@ class Vec:
 
     @property
     def r(self):
+        """Return the vector's red composant"""
         return self.v[0]
 
     @property
     def g(self):
+        """Return the vector's green composant"""
         return self.v[1]
 
     @property
     def b(self):
+        """Return the vector's blue composant"""
         return self.v[2]
 
     @property
@@ -124,6 +128,14 @@ class Vec:
     def rotate90(self):
         assert self.dim() == 2
         return Vec(self.y, -self.x)
+    
+    def add_dim(self, comp=0):
+        """Add a dimension to the vector with the composant 0 if not presized"""
+        self.v.append(comp)
+
+    def remove_dim(self):
+        """Remove the vector's last dimension"""
+        self.v.pop()
 
 
 def dot(v1, v2):
