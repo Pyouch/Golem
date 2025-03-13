@@ -48,13 +48,13 @@ class Vec:
             return self.v[item]
         if isinstance(item, str):
             coordinates = {"x": 0, "y": 1, "z": 2, "w": 3, "r": 0, "g": 1, "b": 2, "a": 3, "0": None}
-            v = []
+            v =  np.array()
             for e in item:
                 assert e in coordinates, f"{e} is not a coordinate"
                 if e == "0":
-                    v.append(0)
+                    v = np.append(v, 0)
                 else:
-                    v.append(self.v[coordinates[e]])
+                    v =np.append(v, self.v[coordinates[e]])
             return Vec(*v)
 
     def bi_operation(self, binary_op, other):
@@ -139,13 +139,7 @@ class Vec:
 
 
 def dot(v1, v2):
-    res = 0
-    v1 = v1.get()
-    v2 = v2.get()
-    assert len(v1) == len(v2)
-    for i in range(len(v1)):
-        res += v1[i] * v2[i]
-    return res
+    return v1.get()*v2.get()
 
 
 def cross(v1, v2):
