@@ -1,10 +1,10 @@
 from math import sqrt
-from numpy import array, matrix
+import numpy as np
 
 
 class Vec:
     def __init__(self, *args):
-        self.v = args
+        self.v = np.array(args)
 
     def dim(self):
         return len(self.v)
@@ -131,11 +131,11 @@ class Vec:
     
     def add_dim(self, comp=0):
         """Add a dimension to the vector with the composant 0 if not presized"""
-        self.v.append(comp)
+        self.v = np.append(self.v, comp)
 
     def remove_dim(self):
         """Remove the vector's last dimension"""
-        self.v.pop()
+        self.v = np.delete(self.v, -1)
 
 
 def dot(v1, v2):
@@ -174,3 +174,12 @@ RIGHT3 = Vec(1, 0)
 LEFT3 = Vec(-1, 0)
 FORWARD3 = Vec(0, 1, 0)
 BACKWARD3 = Vec(0, -1, 0)
+
+if __name__=="__main__":
+    test = Vec(0,0)
+    print(test.dim())
+    test.add_dim(1)
+    print(test.dim(), test)
+    test.remove_dim()
+    print(test.dim(), test)
+    
