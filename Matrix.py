@@ -17,7 +17,7 @@ class Matrix:
             self.mat.shape = (size, size)
             self.mat = np.transpose(self.mat)
 
-        elif isinstance(args[0], list) and len(args) == 1:
+        elif (isinstance(args[0], list) and len(args) == 1) or (isinstance(args[0], np.ndarray) and len(args[0]) == 1):
             self.mat = np.array((args[0]))
 
         elif isinstance(args[0], list):
