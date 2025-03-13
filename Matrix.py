@@ -10,8 +10,9 @@ class Matrix:
             self.mat = np.array(args)
             self.mat.shape = (size, size)
             
-        elif isinstance(args[0], Vec):
-            size = len(args)
+        elif isinstance(args[0], Vec) or isinstance(args[0], np.ndarray): 
+            if isinstance(args[0], Vec): size = args[0].dim
+            else: size = len(args[0])
             self.mat = np.array(args)
             self.mat.shape = (size, size)
             self.mat = np.transpose(self.mat)
