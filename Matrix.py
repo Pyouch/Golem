@@ -28,21 +28,11 @@ class Matrix:
     def dim(self):
         return len(self.mat)
 
+
     def __mul__(self, other):
-        if isinstance(other, Matrix):
-            assert other.dim() == self.dim()
-            res = [[0 for _ in range(self.dim())] for _ in range(self.dim())]
-            for i in range(self.dim()):
-                for j in range(self.dim()):
-                    for k in range(self.dim()):
-                        res[i][j] += self.mat[i][k] * other.mat[k][j]
-            return Matrix(res)
-        elif isinstance(other, Vec):
-            assert other.dim() == self.dim()
-            res = []
-            for i in range(self.dim()):
-                res.append(dot(Vec(*self.mat[i]), other))
-            return Vec(*res)
+        """Do the matrix product between self and other"""
+        return np.dot(self.mat, other.mat)
+
 
     def __str__(self):
         return str(self.mat)
