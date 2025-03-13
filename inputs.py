@@ -67,6 +67,10 @@ class Inputs:
             raise Exception(f"key {key} does not exist")
 
     def pressed(self, key):
+        """
+        @param key : 
+        @return bool : key exist and is pressed
+        """
         key = self.key_id(key)
         return key in self.events and self.events[key].pressed
 
