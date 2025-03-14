@@ -6,6 +6,13 @@ from random import random
 
 
 def generate_terrain(size, relief=10, octaves=5, seed=None):
+    """génère le terrain
+    @param size : int, longueur (nombre de case) du côté du terrain
+    @param relief: int, hauteur maximale ?, si non précisé vaut 10
+    @param octaves: int, ? , si non précisé vaut 5
+    @param seed: int, graine de génération,None (1) si non précisé
+    @return matrice de terrain : contient la hauteur de chaque case
+    """
     if seed is None:
         seed = 1
     noise = PerlinNoise(octaves, seed)
