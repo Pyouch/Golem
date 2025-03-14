@@ -56,7 +56,7 @@ def run(nb_times=-1):
         if inputs.holding(pg.K_LSHIFT):
             view.engine.lights[0].pos += Vec(0, 0, 0.5) * 1/2
         framerate = 1000 / clock.tick(30)
-        if nb_times % 30 == 0:
+        if inputs.pressed(pg.K_t):
             print(framerate)
         nb_times -= 1
 
