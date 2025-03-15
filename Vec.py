@@ -123,11 +123,11 @@ class Vec:
     
     def add_dim(self, comp=0):
         """Add a dimension to the vector with the composant 0 if not presized"""
-        self.v = np.append(self.v, comp)
+        return Vec(np.append(self.v, comp))
 
     def remove_dim(self):
         """Remove the vector's last dimension"""
-        self.v = np.delete(self.v, -1)
+        return Vec(np.delete(self.v, -1))
 
 
 def dot(v1, v2):

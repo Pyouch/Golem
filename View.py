@@ -22,9 +22,9 @@ class View:
                 for k in range(len(corners)):
                     if corners[k].x + i < len(heights) and \
                             corners[k].y + j < len(heights[corners[k].x + i]):
-                        d = corners[k]["xy0"]
+                        d = corners[k].add_dim()
                         for l in range(heights[i][j], heights[corners[k].x + i][corners[k].y + j]):
-                            pos = Vec(i, j, l)+d, Vec(i, j, l+1)+d-d["xy"].rotate90()["xy0"]*((-1)**k)
+                            pos = Vec(i, j, l)+d, Vec(i, j, l+1)+d-d.remove_dim().rotate90().add_dim()*((-1)**k)
                             self.engine.add_buffer(quad_vert_3d(*pos, color=Vec(97, 74, 52)))
 
         for light in self.engine.lights:
