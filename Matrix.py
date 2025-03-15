@@ -2,6 +2,7 @@ from Vec import Vec, dot
 from math import sqrt, cos, sin, pi
 import numpy as np
 
+
 class Matrix:
     def __init__(self, *args):
         self.mat = np.array([])
@@ -9,18 +10,21 @@ class Matrix:
             size = int(sqrt(len(args)))
             self.mat = np.array(args)
             self.mat.shape = (size, size)
-            
-        elif isinstance(args[0], Vec) or isinstance(args[0], np.ndarray): 
-            if isinstance(args[0], Vec): size = args[0].dim
-            else: size = len(args[0])
-            self.mat = np.array(args)
-            self.mat.shape = (size, size)
-            self.mat = np.transpose(self.mat)
 
-        elif (isinstance(args[0], list) and len(args) == 1) or (isinstance(args[0], np.ndarray) and len(args[0]) == 1):
-            self.mat = np.array((args[0]))
+        elif isinstance(args[0], list) and len(args) == 1:
+            self.mat = np.array(args[0])
+            if 1 <= len(self.mat.shape) <= 2:
+                raise RuntimeError("Une matrice doit être 2D (ou éventuellement 1D)")
+        elif isinstance(args[0], np.ndarray) and len(args) == 1:
+            if len(args[0].shape) == 1: self.mat = args[0].reshape((len(args[0]), 1))
+            elif len(args[0].shape) == 2: self.mat = args[0]
+            else: raise RuntimeError("Une matrice doit être 2D (ou éventuellement 1D)")
 
-        elif isinstance(args[0], list):
+        elif isinstance(args[0], Vec):
+            a = [v.get() for v in args]
+            self.mat = np.array(a).transpose()
+
+        elif isinstance(args[0], np.ndarray) or isinstance(args[0], list):
             size = len(args)
             self.mat = np.array(args)
             self.mat.shape = (size, size)
@@ -36,15 +40,15 @@ class Matrix:
             res = np.dot(self.mat, other.mat)
             return Matrix(res)
         elif isinstance(other, Vec):
-            res = np.dot(self.mat, other)
-            return Vec(*res)
+            res = np.dot(self.mat, other.get().transpose())
+            return Vec(res)
 
 
     def __str__(self):
         return str(self.mat)
 
     def transpose(self):
-        return np.transpose(self.mat)
+        return Matrix(np.transpose(self.mat))
 
     @classmethod
     def rotation_x(cls, theta):

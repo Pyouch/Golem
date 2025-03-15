@@ -6,7 +6,7 @@ import pygame as pg
 class View:
     def __init__(self):
         self.screenSize = Vec(1100, 700)
-        self.screen = pg.display.set_mode(self.screenSize.get())
+        self.screen = pg.display.set_mode(list(self.screenSize.get()))
         self.engine = ViewEngine(self.screen)
         self.engine.add_point_light(Vec(5, 5, -3), Vec(1, 1, 1), 5)
         self.engine.set_light_color(Vec(0.2, 0.2, 0.2))

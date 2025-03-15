@@ -2,43 +2,64 @@ from math import sqrt
 import numpy as np
 
 
+def extract_ndarray(other):
+    if isinstance(other, Vec): return other.v
+    else: return other
+
+
 class Vec:
     def __init__(self, *args):
-        self.v = np.array(elt for elt in args)
+        self.isInt = True
+        if isinstance(args[0], np.ndarray):
+            if len(args[0].shape) != 1:
+                raise RuntimeError("Vec doit être un ndarray de dimension 2")
+            self.v = args[0]
+            self.isInt = isinstance(args[0][0], np.signedinteger)
+
+        elif isinstance(args[0], float) or isinstance(args[0], int):
+            self.v = np.array(args)
+            self.isInt = isinstance(args[0], int)
+
+        else:
+            raise RuntimeError("Arguments invalides")
 
     def dim(self):
         return len(self.v)
 
-    @property
-    def x(self): return self.v[0]
+    def int_or_float(self, elt):
+        if self.isInt: return int(elt)
+        else: return float(elt)
 
     @property
-    def y(self): return self.v[1]
+    def x(self): return self.int_or_float(self.v[0])
 
     @property
-    def z(self): return self.v[2]
+    def y(self): return self.int_or_float(self.v[1])
 
     @property
-    def w(self): return self.v[3]
+    def z(self): return self.int_or_float(self.v[2])
+
+    @property
+    def w(self): return self.int_or_float(self.v[3])
 
     @property
     def r(self):
         """Return the vector's red composant"""
-        return self.v[0]
+        return self.int_or_float(self.v[0])
 
     @property
     def g(self):
         """Return the vector's green composant"""
-        return self.v[1]
+        return self.int_or_float(self.v[1])
 
     @property
     def b(self):
         """Return the vector's blue composant"""
-        return self.v[2]
+        return self.int_or_float(self.v[2])
 
     @property
     def a(self):
-        return self.v[3]
+        return self.int_or_float(self.v[3])
 
     def get(self):
         return self.v
@@ -48,64 +69,35 @@ class Vec:
             return self.v[item]
         if isinstance(item, str):
             coordinates = {"x": 0, "y": 1, "z": 2, "w": 3, "r": 0, "g": 1, "b": 2, "a": 3, "0": None}
-            v =  np.array([])
+            v = np.array([])
             for e in item:
                 assert e in coordinates, f"{e} is not a coordinate"
                 if e == "0":
                     v = np.append(v, 0)
                 else:
-                    v =np.append(v, self.v[coordinates[e]])
+                    v = np.append(v, self.v[coordinates[e]])
             return Vec(*v)
 
-    def bi_operation(self, binary_op, other):
-        v1 = list(self.get())
-        v2 = list(other.get())
-        for i in range(len(v1)):
-            v1[i] = binary_op(v1[i], v2[i])
-        return Vec(*v1)
-
-    def un_operation(self, unary_op):
-        v = list(self.get())
-        for i in range(len(v)):
-            v[i] = unary_op(v[i])
-        return Vec(*v)
-
     def __add__(self, other):
-        return self.bi_operation(lambda x, y: x + y, other)
+        return Vec(self.v + extract_ndarray(other))
 
     def __sub__(self, other):
-        return self.bi_operation(lambda x, y: x - y, other)
+        return Vec(self.v - extract_ndarray(other))
 
     def __mul__(self, other):
-        if isinstance(other, int) or isinstance(other, float):
-            return self.un_operation(lambda x: x * other)
-        elif isinstance(other, Vec):
-            return self.bi_operation(lambda x, y: x * y, other)
-        else:
-            assert True
+        return Vec(self.v * extract_ndarray(other))
 
     def __rmul__(self, other):
-        if isinstance(other, int) or isinstance(other, float):
-            return self.un_operation(lambda x: x * other)
+        return self * extract_ndarray(other)
 
     def __truediv__(self, other):
-        if isinstance(other, int) or isinstance(other, float):
-            return self.un_operation(lambda x: x / other)
-        elif isinstance(other, Vec):
-            return self.bi_operation(lambda x, y: x / y, other)
-        else:
-            assert True
+        return Vec(self.v / extract_ndarray(other))
 
     def __floordiv__(self, other):
-        if isinstance(other, int):
-            return self.un_operation(lambda x: x // other)
-        elif isinstance(other, Vec):
-            return self.bi_operation(lambda x, y: x // y, other)
-        else:
-            assert True
+        return Vec(self.v // extract_ndarray(other))
 
     def __mod__(self, other):
-        return self.un_operation(lambda x: x % other)
+        return Vec(self.v % extract_ndarray(other))
 
     def __str__(self):
         return "vec" + str(self.v)
