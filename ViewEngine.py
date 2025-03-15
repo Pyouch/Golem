@@ -1,20 +1,33 @@
 from Matrix import *
 from Light import *
 from GraphicPrimitives import *
+from Plan import *
 
 
-class Point3D:
-    def __init__(self, pos: Vec, color: Vec):
+class Primitive3D:
+    def __init__(self, pos, size=0):
+        """
+        :param pos: The position of the middle of the primitive
+        :param size: The distance between the position and the most far point of
+        the primitive.
+        """
         self.pos = pos
+        self.size = size
+
+
+class Point3D(Primitive3D):
+    def __init__(self, pos: Vec, color: Vec):
+        super().__init__(pos)
         self.color = color
 
     def to_2d(self, engine):
         return Point2D(engine.to_screen(self.pos), self.color)
 
 
-class Quad3D:
+class Quad3D(Primitive3D):
     def __init__(self, v1, v2, v3, v4, color):
-        self.pos = (v1 + v2 + v3 + v4) / 4
+        pos = (v1 + v2 + v3 + v4) / 4
+        super().__init__(pos, max(dist(pos, v1), dist(pos, v2), dist(pos, v3), dist(pos, v4)))
         self.corners = v1, v2, v3, v4
         self.color = color
 
@@ -59,12 +72,14 @@ def quad_vert_3d(a, b, color=Vec(255, 255, 255)):
 
 class ViewEngine:
     base_matrix = Matrix.rotation_z(pi / 4) * Matrix.rotation_x(pi / 4)
+    TILE_SIZE = 40
 
     def __init__(self, screen: pg.Surface):
-        self.base = [0, 0, 0]
-        self.base[0] = self.base_matrix * Vec(1, 0, 0) * 40
-        self.base[1] = self.base_matrix * Vec(0, 1, 0) * 40
-        self.base[2] = self.base_matrix * Vec(0, 0, 1) * 40
+        self.base = [
+            self.base_matrix * Vec(1, 0, 0) * self.TILE_SIZE,
+            self.base_matrix * Vec(0, 1, 0) * self.TILE_SIZE,
+            self.base_matrix * Vec(0, 0, 1) * self.TILE_SIZE
+        ]
         self.matrix = Matrix(self.base[0], self.base[1], self.base[2]).transpose()
         self.screen_size = Vec(*screen.get_size())
         self.screen = screen
@@ -75,6 +90,13 @@ class ViewEngine:
         self.lights = []
 
         self.to_draw_buffer = []
+
+        self.vision_delimiter_plans = [
+            Plan(-self.base[0] * self.screen_size[0] / 2 / self.TILE_SIZE**2, self.base[0]),
+            Plan(self.base[0] * self.screen_size[0] / 2 / self.TILE_SIZE**2, -self.base[0]),
+            Plan(-self.base[1] * self.screen_size[1] / 2 / self.TILE_SIZE**2, self.base[1]),
+            Plan(self.base[1] * self.screen_size[1] / 2 / self.TILE_SIZE**2, -self.base[1])
+        ]
 
     def change_base(self, matrix):
         self.base_matrix = matrix
@@ -105,13 +127,13 @@ class ViewEngine:
     def color(self, pos, normal, color):
         return self._intensity(pos, normal) * color
 
-    def _intensity(self, pos, normal):
+    def _intensity(self, pos: Vec, normal: Vec) -> Vec:
         res = self._radiance(normal) + self._lights(pos, normal)
         return Vec(max(min(res.r, 1), 0), max(0, min(res.g, 1)), max(0, min(res.b, 1)))
 
     def _radiance(self, normal):
-        """ Met la lumière type Soleil
-        Attention, elle suppose que regarder une face d'un côté, ou de l'autre ne change rien.
+        """ It puts some light if it's in the direction of the light_direction
+        It supposes that if we look it from behind or from front, it doesn't change anything.
         """
         return abs(dot(normal, self.light_direction)) * self.light_color
 
@@ -123,9 +145,18 @@ class ViewEngine:
             res += light.apply(pos, normal)
         return Vec(min(1, res.r), min(1, res.g), min(1, res.b))
 
-    def add_buffer(self, elt):
+    def add_buffer(self, elt: Primitive3D) -> bool:
+        """
+        Ajoute dans le buffer la primitive 3D.
+        :return: Si elle a été ajoutée ou pas (Peut ne pas être ajoutée si la
+        primitive n'est pas visible)
+        """
+        for plan in self.vision_delimiter_plans:
+            if not plan.in_normal_dir(elt.pos, elt.size):
+                return False
         key = self.cam_dist(elt.pos)
         self.to_draw_buffer.append((key, elt))
+        return True
 
     def draw_buffer(self):
         self.to_draw_buffer.sort(reverse=True, key=lambda e: e[0])
