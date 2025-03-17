@@ -98,7 +98,7 @@ class ViewEngine:
         return (self.matrix * v).remove_dim() + self.screen_size / 2
 
     def cam_dist(self, pos):
-        return (self.matrix * pos).z
+        return dot(pos, self.base[2])
 
 
 

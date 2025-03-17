@@ -129,24 +129,22 @@ class Vec:
         """Remove the vector's last dimension"""
         return Vec(np.delete(self.v, -1))
 
+    def to_int(self):
+        """ returns a Vec of ints instead of a Vec of floats """
+        return Vec(np.int64(self.v))
+
+    def to_float(self):
+        """ returns a Vec of floats instead of a Vec of ints """
+        return Vec(np.float64(self.v))
+
 
 def dot(v1, v2):
-    res = 0
-    v1 = v1.get()
-    v2 = v2.get()
-    assert len(v1) == len(v2)
-    for i in range(len(v1)):
-        res += v1[i] * v2[i]
-    return res
+    return np.sum(v1.get() * v2.get())
 
 
 def cross(v1, v2):
     """ v1 and v2 must be of dimension 3 """
-    return Vec(
-        v1.y * v2.z - v1.z * v2.y,
-        v1.z * v2.x - v1.x * v2.z,
-        v1.x * v2.y - v1.y * v2.x
-    )
+    return Vec(np.cross(v1.get(), v2.get()))
 
 
 def dist(v1, v2):
@@ -167,7 +165,7 @@ LEFT3 = Vec(-1, 0)
 FORWARD3 = Vec(0, 1, 0)
 BACKWARD3 = Vec(0, -1, 0)
 
-if __name__=="__main__":
+if __name__ == "__main__":
     test = Vec(2,3)
     #print(test.dim())
     test.add_dim(1)
