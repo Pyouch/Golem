@@ -80,8 +80,11 @@ class ViewEngine:
             self.base_matrix * Vec(0, 1, 0) * self.TILE_SIZE,
             self.base_matrix * Vec(0, 0, 1) * self.TILE_SIZE
         ]
-        self.matrix = Matrix(self.base[0], self.base[1], self.base[2]).transpose()
         self.screen_size = Vec(*screen.get_size())
+        self.matrix = Matrix(self.base[0]["xyz0"]+Vec(0, 0, 0, self.screen_size.x/2),
+                             self.base[1]["xyz0"]+Vec(0, 0, 0, self.screen_size.y/2),
+                             self.base[2]["xyz0"],
+                             Vec(0, 0, 0, 1)).transpose()
         self.screen = screen
 
         self.light_direction = Vec(1, 1, 1).normalize()
@@ -117,10 +120,11 @@ class ViewEngine:
         self.lights.append(PointLight(pos, color, power))
 
     def to_screen(self, v):
-        return (self.matrix * v)["xy"] + self.screen_size / 2
+        res = self.matrix * v["xyz1"]
+        return res["xy"]
 
     def cam_dist(self, pos):
-        return (self.matrix * pos).z
+        return dot(pos, self.base[2])
 
 
 

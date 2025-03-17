@@ -2,7 +2,6 @@ from ViewEngine import *
 import pygame as pg
 
 
-
 class View:
     def __init__(self):
         self.screenSize = Vec(1100, 700)
