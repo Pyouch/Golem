@@ -2,7 +2,7 @@ from math import sqrt
 import numpy as np
 
 
-def extract_ndarray(other):
+def _extract_ndarray(other):
     if isinstance(other, Vec): return other.v
     else: return other
 
@@ -24,42 +24,44 @@ class Vec:
             raise RuntimeError("Arguments invalides")
 
     def dim(self):
+        """ Return the dimension of the vector """
         return len(self.v)
 
-    def int_or_float(self, elt):
+    def _int_or_float(self, elt):
         if self.isInt: return int(elt)
         else: return float(elt)
 
     @property
-    def x(self): return self.int_or_float(self.v[0])
+    def x(self): return self._int_or_float(self.v[0])
 
     @property
-    def y(self): return self.int_or_float(self.v[1])
+    def y(self): return self._int_or_float(self.v[1])
 
     @property
-    def z(self): return self.int_or_float(self.v[2])
+    def z(self): return self._int_or_float(self.v[2])
 
     @property
-    def w(self): return self.int_or_float(self.v[3])
+    def w(self): return self._int_or_float(self.v[3])
 
     @property
     def r(self):
         """Return the vector's red composant"""
-        return self.int_or_float(self.v[0])
+        return self._int_or_float(self.v[0])
 
     @property
     def g(self):
         """Return the vector's green composant"""
-        return self.int_or_float(self.v[1])
+        return self._int_or_float(self.v[1])
 
     @property
     def b(self):
         """Return the vector's blue composant"""
-        return self.int_or_float(self.v[2])
+        return self._int_or_float(self.v[2])
 
     @property
     def a(self):
-        return self.int_or_float(self.v[3])
+        """Return the vector's alpha composant"""
+        return self._int_or_float(self.v[3])
 
     def get(self):
         return self.v
@@ -79,25 +81,25 @@ class Vec:
             return Vec(*v)
 
     def __add__(self, other):
-        return Vec(self.v + extract_ndarray(other))
+        return Vec(self.v + _extract_ndarray(other))
 
     def __sub__(self, other):
-        return Vec(self.v - extract_ndarray(other))
+        return Vec(self.v - _extract_ndarray(other))
 
     def __mul__(self, other):
-        return Vec(self.v * extract_ndarray(other))
+        return Vec(self.v * _extract_ndarray(other))
 
     def __rmul__(self, other):
-        return self * extract_ndarray(other)
+        return self * _extract_ndarray(other)
 
     def __truediv__(self, other):
-        return Vec(self.v / extract_ndarray(other))
+        return Vec(self.v / _extract_ndarray(other))
 
     def __floordiv__(self, other):
-        return Vec(self.v // extract_ndarray(other))
+        return Vec(self.v // _extract_ndarray(other))
 
     def __mod__(self, other):
-        return Vec(self.v % extract_ndarray(other))
+        return Vec(self.v % _extract_ndarray(other))
 
     def __str__(self):
         return "vec" + str(self.v)
@@ -109,15 +111,18 @@ class Vec:
         return self * (-1)
 
     def size(self):
+        """ Return the norm of the vector """
         return sqrt(dot(self, self))
 
     def normalize(self):
+        """ Return the vector normalized """
         s = self.size()
         if s == 0:
             return Vec(*self.v)
         return self / s
 
     def rotate90(self):
+        """ Rotate the vector anti-clockwise """
         assert self.dim() == 2
         return Vec(self.y, -self.x)
     
@@ -139,15 +144,18 @@ class Vec:
 
 
 def dot(v1, v2):
+    """ Return the dot product of v1 and v2 """
     return np.sum(v1.get() * v2.get())
 
 
 def cross(v1, v2):
-    """ v1 and v2 must be of dimension 3 """
+    """ Return the cross product of v1 and v2
+    v1 and v2 must be of dimension 3 """
     return Vec(np.cross(v1.get(), v2.get()))
 
 
 def dist(v1, v2):
+    """ Returns the distance between v1 and v2 """
     return (v1-v2).dim()
 
 
