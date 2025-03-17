@@ -125,6 +125,12 @@ class Vec:
         assert self.dim() == 2
         return Vec(self.y, -self.x)
 
+    def remove_dim(self):
+        return Vec(*self.get()[:-1])
+
+    def __hash__(self):
+        return hash(self.get())
+
 
 def dot(v1, v2):
     res = 0

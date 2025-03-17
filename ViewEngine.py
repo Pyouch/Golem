@@ -98,6 +98,8 @@ class ViewEngine:
             Plan(self.base[1] * self.screen_size[1] / 2 / self.TILE_SIZE**2, -self.base[1])
         ]
 
+        self.projected_points = {}
+
     def change_base(self, matrix):
         self.base_matrix = matrix
         self.base[0] = self.base_matrix * Vec(1, 0, 0) * 40
@@ -117,7 +119,12 @@ class ViewEngine:
         self.lights.append(PointLight(pos, color, power))
 
     def to_screen(self, v):
-        return (self.matrix * v)["xy"] + self.screen_size / 2
+        if v in self.projected_points:
+            return self.projected_points[v]
+        else:
+            p = (self.matrix * v).remove_dim() + self.screen_size / 2
+            self.projected_points[v] = p
+            return p
 
     def cam_dist(self, pos):
         return (self.matrix * pos).z
@@ -166,6 +173,8 @@ class ViewEngine:
 
     def finalize(self):
         self.draw_buffer()
+        self.projected_points = {}
+        # TODO: clear les projected_points lorsqu'on modifie la caméra
 
 
 if __name__ == "__main__":
