@@ -12,9 +12,11 @@ class View:
         self.engine.set_light_color(Vec(0.2, 0.2, 0.2))
 
     def bg(self):
+        """ Fill the screen in black """
         self.screen.fill(0)
 
     def draw_terrain(self, heights, colors):
+        """ Draw a terrain described by the relief of the terrain and the colors of the cases """
         corners = Vec(1, 0), Vec(0, 1)
         for i in (range(len(heights))):
             for j in (range(len(heights[i]))):
@@ -30,6 +32,23 @@ class View:
         for light in self.engine.lights:
             self.engine.add_buffer(point_3d(light.pos))
 
+    def draw_quad(self, v1: Vec, v2: Vec, v3: Vec, v4: Vec, color=Vec(255, 255, 255)):
+        """ Draw a quad """
+        self.engine.add_buffer(Quad3D(v1, v2, v3, v4, color))
+
+    def draw_quad_hor(self, a: Vec, b: Vec, h=None, color=Vec(255, 255, 255)):
+        """ Draw a horizontal quad """
+        self.engine.add_buffer(quad_hor_3d(a, b, h, color))
+
+    def draw_quad_vert(self, a: Vec, b: Vec, color=Vec(255, 255, 255)):
+        """ Draw a vertical quad """
+        self.engine.add_buffer(quad_vert_3d(a, b, color))
+
+    def draw_point(self, pos: Vec, color=Vec(255, 255, 255)):
+        """ Draw a point """
+        self.engine.add_buffer(Point3D(pos, color))
+
     def finalize(self):
+        """ Draw on the screen """
         self.engine.finalize()
         pg.display.flip()
