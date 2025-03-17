@@ -32,7 +32,7 @@ def run(nb_times=-1):
                [0, 0, 0, 0, 0, 0, 0, 0, 10],
                [10, 10, 10, 10, 10, 10, 10, 10, 10]]
 
-    heights = generate_terrain(20, seed=random())
+    heights = generate_terrain(40, seed=random())
 
     colors = [[Vec(20, 255, 20) for _ in range(len(heights[i]))] for i in range(len(heights))]
     clock = pg.time.Clock()
@@ -55,7 +55,9 @@ def run(nb_times=-1):
             view.engine.lights[0].pos += Vec(0, 0, -0.5) * 1/2
         if inputs.holding(pg.K_LSHIFT):
             view.engine.lights[0].pos += Vec(0, 0, 0.5) * 1/2
-        clock.tick(30)
+        framerate = 1000 / clock.tick(30)
+        if inputs.pressed(pg.K_t):
+            print(framerate)
         nb_times -= 1
 
     pg.quit()
