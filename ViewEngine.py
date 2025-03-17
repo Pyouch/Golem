@@ -41,9 +41,9 @@ def quad_hor_3d(a, b, h=None, color=Vec(255, 255, 255)):
     assert a.dim() == 2 or h is not None, "v1 must be of dimension 3, or the parameter h must be filled"
     if h is None:
         h = a.z
-    v1 = a["xy0"] + Vec(0, 0, h)
+    v1 = a.add_dim() + Vec(0, 0, h)
     v2 = Vec(b.x, a.y, h)
-    v3 = b["xy0"] + Vec(0, 0, h)
+    v3 = b.add_dim() + Vec(0, 0, h)
     v4 = Vec(a.x, b.y, h)
     return quad_3d(v1, v2, v3, v4, color)
 
@@ -95,10 +95,10 @@ class ViewEngine:
         self.lights.append(PointLight(pos, color, power))
 
     def to_screen(self, v):
-        return (self.matrix * v)["xy"] + self.screen_size / 2
+        return (self.matrix * v).remove_dim() + self.screen_size / 2
 
     def cam_dist(self, pos):
-        return (self.matrix * pos).z
+        return dot(pos, self.base[2])
 
 
 
