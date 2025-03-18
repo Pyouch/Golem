@@ -142,6 +142,12 @@ class Vec:
         """ returns a Vec of floats instead of a Vec of ints """
         return Vec(np.float64(self.v))
 
+    def remove_dim(self):
+        return Vec(*self.get()[:-1])
+
+    def __hash__(self):
+        return hash(self.get())
+
 
 def dot(v1, v2):
     """ Return the dot product of v1 and v2 """
