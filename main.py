@@ -2,6 +2,7 @@ from View import *
 from inputs import *
 import pygame as pg
 from perlin_noise import PerlinNoise
+from time import time
 from random import random
 
 
@@ -32,11 +33,12 @@ def run(nb_times=-1):
                [0, 0, 0, 0, 0, 0, 0, 0, 10],
                [10, 10, 10, 10, 10, 10, 10, 10, 10]]
 
-    heights = generate_terrain(40, seed=random())
+    heights = generate_terrain(100, seed=time())
 
     colors = [[Vec(20, 255, 20) for _ in range(len(heights[i]))] for i in range(len(heights))]
     clock = pg.time.Clock()
 
+    h = 0
     while not inputs.quit and nb_times != 0:
         view.bg()
         inputs.update()
@@ -55,6 +57,16 @@ def run(nb_times=-1):
             view.engine.lights[0].pos += Vec(0, 0, -0.5) * 1/2
         if inputs.holding(pg.K_LSHIFT):
             view.engine.lights[0].pos += Vec(0, 0, 0.5) * 1/2
+
+        """ Pour qu'il suive la souris:
+        if inputs.holding(pg.K_UP):
+            h += 1/2
+        if inputs.holding(pg.K_DOWN):
+            h -= 1/2
+        view.engine.lights[0].pos = (view.engine.base[0]/40/40 * (inputs.mouse_pos.x - view.screenSize.x/2) +
+                                     view.engine.base[1]/40/40 * (inputs.mouse_pos.y - view.screenSize.y/2) +
+                                     view.engine.base[2]/40 * h)
+        """
         framerate = 1000 / clock.tick(30)
         if inputs.pressed(pg.K_t):
             print(framerate)
