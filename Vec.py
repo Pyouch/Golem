@@ -161,7 +161,7 @@ def cross(v1, v2):
 
 def dist(v1, v2):
     """ Returns the distance between v1 and v2 """
-    return (v1-v2).dim()
+    return (v1-v2).size()
 
 
 ZERO2 = Vec(0, 0)
