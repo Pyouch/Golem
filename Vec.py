@@ -70,12 +70,14 @@ class Vec:
         if isinstance(item, int):
             return self.v[item]
         if isinstance(item, str):
-            coordinates = {"x": 0, "y": 1, "z": 2, "w": 3, "r": 0, "g": 1, "b": 2, "a": 3, "0": None}
-            v = np.array([])
+            coordinates = {"x": 0, "y": 1, "z": 2, "w": 3, "r": 0, "g": 1, "b": 2, "a": 3, "0": None, "1": None}
+            v = []
             for e in item:
                 assert e in coordinates, f"{e} is not a coordinate"
                 if e == "0":
-                    v = np.append(v, 0)
+                    v.append(0)
+                elif e == "1":
+                    v.append(1)
                 else:
                     v = np.append(v, self.v[coordinates[e]])
             return Vec(*v)
