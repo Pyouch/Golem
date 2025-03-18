@@ -1,60 +1,54 @@
 from Vec import Vec, dot
 from math import sqrt, cos, sin, pi
+import numpy as np
 
 
 class Matrix:
     def __init__(self, *args):
-        self.mat = []
+        self.mat = np.array([])
         if isinstance(args[0], int) or isinstance(args[0], float):
             size = int(sqrt(len(args)))
-            self.mat = [[0 for _ in range(size)] for _ in range(size)]
-            for j in range(size):
-                for i in range(size):
-                    self.mat[j][i] = args[i+j*size]
+            self.mat = np.array(args)
+            self.mat.shape = (size, size)
+
+        elif isinstance(args[0], list) and len(args) == 1:
+            self.mat = np.array(args[0])
+            if 1 <= len(self.mat.shape) <= 2:
+                raise RuntimeError("Une matrice doit être 2D (ou éventuellement 1D)")
+        elif isinstance(args[0], np.ndarray) and len(args) == 1:
+            if len(args[0].shape) == 1: self.mat = args[0].reshape((len(args[0]), 1))
+            elif len(args[0].shape) == 2: self.mat = args[0]
+            else: raise RuntimeError("Une matrice doit être 2D (ou éventuellement 1D)")
 
         elif isinstance(args[0], Vec):
+            a = [v.get() for v in args]
+            self.mat = np.array(a).transpose()
+
+        elif isinstance(args[0], np.ndarray) or isinstance(args[0], list):
             size = len(args)
-            self.mat = [[0 for _ in range(size)] for _ in range(size)]
-            for j in range(size):
-                for i in range(size):
-                    self.mat[j][i] = args[i][j]
-        elif isinstance(args[0], list) and len(args) == 1:
-            self.mat = args[0]
-        elif isinstance(args[0], list):
-            size = len(args)
-            self.mat = [[0 for _ in range(size)] for _ in range(size)]
-            for j in range(size):
-                for i in range(size):
-                    self.mat[j][i] = args[j][i]
+            self.mat = np.array(args)
+            self.mat.shape = (size, size)
+            
 
     def dim(self):
         return len(self.mat)
 
+
     def __mul__(self, other):
+        """Do the matrix product between self and other"""
         if isinstance(other, Matrix):
-            assert other.dim() == self.dim()
-            res = [[0 for _ in range(self.dim())] for _ in range(self.dim())]
-            for i in range(self.dim()):
-                for j in range(self.dim()):
-                    for k in range(self.dim()):
-                        res[i][j] += self.mat[i][k] * other.mat[k][j]
+            res = np.dot(self.mat, other.mat)
             return Matrix(res)
         elif isinstance(other, Vec):
-            assert other.dim() == self.dim()
-            res = []
-            for i in range(self.dim()):
-                res.append(dot(Vec(*self.mat[i]), other))
-            return Vec(*res)
+            res = np.dot(self.mat, other.get().transpose())
+            return Vec(res)
+
 
     def __str__(self):
         return str(self.mat)
 
     def transpose(self):
-        mat = [[0 for _ in range(self.dim())] for _ in range(self.dim())]
-        for i in range(self.dim()):
-            for j in range(self.dim()):
-                mat[i][j] = self.mat[j][i]
-        return Matrix(mat)
+        return Matrix(np.transpose(self.mat))
 
     @classmethod
     def rotation_x(cls, theta):
@@ -74,7 +68,7 @@ if __name__ == "__main__":
     print(m)
     print(m.transpose())
 
-    m = Matrix(1, 2, 3, 4)
+    """m = Matrix(1, 2, 3, 4)
     print(m * m)
 
     m1 = Matrix.rotation_x(-pi / 4)
@@ -83,4 +77,4 @@ if __name__ == "__main__":
     print(m2)
     print(m2 * m1 * Vec(1, 0, 0))
     print(m2 * m1 * Vec(0, 1, 0))
-    print(m2 * m1 * Vec(0, 0, 1))
+    print(m2 * m1 * Vec(0, 0, 1))"""
