@@ -125,7 +125,7 @@ class ViewEngine:
         if v in self.projected_points:
             return self.projected_points[v]
         else:
-            p = (self.matrix * v).remove_dim() + self.screen_size / 2
+            p = (self.matrix * v.add_dim(1)).remove_dim(2)
             self.projected_points[v] = p
             return p
 

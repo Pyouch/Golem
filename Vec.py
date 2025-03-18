@@ -79,7 +79,7 @@ class Vec:
                 elif e == "1":
                     v.append(1)
                 else:
-                    v = np.append(v, self.v[coordinates[e]])
+                    v.append(self.v[coordinates[e]])
             return Vec(*v)
 
     def __add__(self, other):
@@ -132,9 +132,9 @@ class Vec:
         """Add a dimension to the vector with the composant 0 if not presized"""
         return Vec(np.append(self.v, comp))
 
-    def remove_dim(self):
+    def remove_dim(self, nb_dims=1):
         """Remove the vector's last dimension"""
-        return Vec(np.delete(self.v, -1))
+        return Vec(self.v[:-nb_dims])
 
     def to_int(self):
         """ returns a Vec of ints instead of a Vec of floats """

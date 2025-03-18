@@ -33,7 +33,7 @@ def run(nb_times=-1):
                [0, 0, 0, 0, 0, 0, 0, 0, 10],
                [10, 10, 10, 10, 10, 10, 10, 10, 10]]
 
-    heights = generate_terrain(100, seed=time())
+    heights = generate_terrain(20, seed=time())
 
     colors = [[Vec(20, 255, 20) for _ in range(len(heights[i]))] for i in range(len(heights))]
     clock = pg.time.Clock()
