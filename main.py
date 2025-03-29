@@ -22,7 +22,6 @@ def generate_terrain(size, relief=10, octaves=5, seed=None):
 
 def run(nb_times=-1):
     inputs = Inputs()
-    view = View()
 
     heights = [[0, 0, 1, 1, 1, 2, 2, 2, 10],
                [0, 1, 1, 1, 1, 1, 2, 2, 10],
@@ -33,16 +32,17 @@ def run(nb_times=-1):
                [0, 0, 0, 0, 0, 0, 0, 0, 10],
                [10, 10, 10, 10, 10, 10, 10, 10, 10]]
 
-    heights = generate_terrain(20, seed=time())
+    heights = generate_terrain(50, seed=time())
 
     colors = [[Vec(20, 255, 20) for _ in range(len(heights[i]))] for i in range(len(heights))]
+    view = View(heights, colors)
     clock = pg.time.Clock()
 
     h = 0
     while not inputs.quit and nb_times != 0:
         view.bg()
         inputs.update()
-        view.draw_terrain(heights, colors)
+        view.draw_terrain()
         view.finalize()
         #view.engine.lights[0].pos += Vec(0, 0, 0.01)
         if inputs.holding(pg.K_RIGHT):

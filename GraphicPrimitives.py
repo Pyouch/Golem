@@ -2,15 +2,12 @@ import pygame as pg
 from Vec import *
 
 
-class GraphicPrimitives:
-    def __init__(self, screen):
-        self.screen = screen
-
-    def draw(self, primitive):
-        primitive.draw(self.screen)
+class Primitive2D:
+    def draw(self, screen):
+        pass
 
 
-class Point2D:
+class Point2D(Primitive2D):
     def __init__(self, pos, color=Vec(255, 255, 255)):
         self.pos = pos
         self.color = color
@@ -19,7 +16,7 @@ class Point2D:
         pg.draw.circle(screen, self.color.get(), self.pos.get(), 3)
 
 
-class Quad2D:
+class Quad2D(Primitive2D):
     def __init__(self, p1, p2, p3, p4, color=Vec(255, 255, 255)):
         self.v1 = p1
         self.v2 = p2
@@ -29,3 +26,18 @@ class Quad2D:
 
     def draw(self, screen):
         pg.draw.polygon(screen, self.color.get(), (self.v1.get(), self.v2.get(), self.v3.get(), self.v4.get()))
+
+
+class Container(Primitive2D):
+    def __init__(self, primitives: list[Primitive2D] = None):
+        if primitives is None:
+            self.primitives: list[Primitive2D] = []
+        else:
+            self.primitives: list[Primitive2D] = primitives
+
+    def add(self, primitive: Primitive2D):
+        self.primitives.append(primitive)
+
+    def draw(self, screen):
+        for primitive in self.primitives:
+            primitive.draw(screen)
