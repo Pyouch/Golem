@@ -25,15 +25,15 @@ class View:
         corners = Vec(1, 0), Vec(0, 1)
         for i in (range(len(heights))):
             for j in (range(len(heights[i]))):
-                c = chunks[i//self.CHUNK_SIZE][j//self.CHUNK_SIZE]
+                c = chunks[i // self.CHUNK_SIZE][j // self.CHUNK_SIZE]
                 c.add(quad_hor_3d(Vec(i, j), Vec(i + 1, j + 1), heights[i][j], colors[i][j]))
                 for k in range(len(corners)):
                     if corners[k].x + i < len(heights) and \
                             corners[k].y + j < len(heights[corners[k].x + i]):
                         d = corners[k].add_dim()
-                        for l in range(heights[i][j], heights[corners[k].x + i][corners[k].y + j]):
-                            pos = Vec(i, j, l) + d, Vec(i, j, l + 1) + d - d.remove_dim().rotate90().add_dim() * (
-                                        (-1) ** k)
+                        for n in range(heights[i][j], heights[corners[k].x + i][corners[k].y + j]):
+                            pos = Vec(i, j, n) + d, Vec(i, j, n + 1) + d - d.remove_dim().rotate90().add_dim() * (
+                                    (-1) ** k)
                             c.add(quad_vert_3d(*pos, color=Vec(97, 74, 52)))
         for i in range(len(chunks)):
             for j in range(len(chunks[i])):
