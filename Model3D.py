@@ -20,6 +20,9 @@ class Primitive3D:
     def splittable(self):
         return False
 
+    def finalize(self):
+        pass
+
 
 class Point3D(Primitive3D):
     def __init__(self, pos: Vec, color: Vec):
@@ -54,20 +57,25 @@ class Model3D(Primitive3D):
         self.finalized = False
 
     def add(self, primitive: Primitive3D):
+        self.finalized = False
         self.primitives.append(primitive)
 
     def finalize(self):
+        if self.finalized:
+            return
         self.finalized = True
-        center = Vec(0, 0, 0)
         for primitive in self.primitives:
-            center += primitive.pos
-        center /= len(self.primitives)
+            primitive.finalize()
         for primitive in self.primitives:
-            d = dist(center, primitive.pos) + primitive.size
+            self.pos += primitive.pos
+        self.pos /= max(len(self.primitives), 1)
+        for primitive in self.primitives:
+            d = dist(self.pos, primitive.pos) + primitive.size
             if d > self.size:
                 self.size = d
 
     def to_2d(self, engine):
+        assert self.finalized, "Il faut appeler la methode finalize() avant de dessiner le modèle"
         res = Container()
         for primitive in self.primitives:
             res.add(primitive.to_2d(engine))

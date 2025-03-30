@@ -3,6 +3,8 @@ import pygame as pg
 
 
 class View:
+    CHUNK_SIZE = 10
+
     def __init__(self, heights, colors):
         self.screenSize = Vec(1100, 700)
         self.screen = pg.display.set_mode(list(self.screenSize.get()))
@@ -18,10 +20,13 @@ class View:
     def terrain_model(self, heights, colors):
         """ Create a model 3D representing the terrain"""
         terrain = Model3D()
+        chunks = [[Model3D() for _ in range(len(heights[0]) // self.CHUNK_SIZE + 1)]
+                  for _ in range(len(heights) // self.CHUNK_SIZE + 1)]
         corners = Vec(1, 0), Vec(0, 1)
         for i in (range(len(heights))):
             for j in (range(len(heights[i]))):
-                terrain.add(quad_hor_3d(Vec(i, j), Vec(i + 1, j + 1), heights[i][j], colors[i][j]))
+                c = chunks[i//self.CHUNK_SIZE][j//self.CHUNK_SIZE]
+                c.add(quad_hor_3d(Vec(i, j), Vec(i + 1, j + 1), heights[i][j], colors[i][j]))
                 for k in range(len(corners)):
                     if corners[k].x + i < len(heights) and \
                             corners[k].y + j < len(heights[corners[k].x + i]):
@@ -29,7 +34,10 @@ class View:
                         for l in range(heights[i][j], heights[corners[k].x + i][corners[k].y + j]):
                             pos = Vec(i, j, l) + d, Vec(i, j, l + 1) + d - d.remove_dim().rotate90().add_dim() * (
                                         (-1) ** k)
-                            terrain.add(quad_vert_3d(*pos, color=Vec(97, 74, 52)))
+                            c.add(quad_vert_3d(*pos, color=Vec(97, 74, 52)))
+        for i in range(len(chunks)):
+            for j in range(len(chunks[i])):
+                terrain.add(chunks[i][j])
         terrain.finalize()
         return terrain
 
