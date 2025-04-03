@@ -3,8 +3,8 @@ from Vec import Vec, dot
 
 class Plan:
     def __init__(self, point: Vec, normal: Vec):
-        self.point = point
-        self.normal = normal.normalize()
+        self.point = self.abs_point = point
+        self.normal = self.abs_normal = normal.normalize()
 
     def in_normal_dir(self, point: Vec, tolerance=0) -> int:
         """
@@ -26,3 +26,7 @@ class Plan:
 
     def __str__(self):
         return f"Plan<{self.point}, {self.normal}>"
+
+    def apply_matrix(self, mat, inverse_t_mat):
+        self.point = (mat * self.abs_point.add_dim(1)).remove_dim()
+        self.normal = (inverse_t_mat * self.abs_normal.add_dim(0)).remove_dim()

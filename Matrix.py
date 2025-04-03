@@ -1,6 +1,7 @@
 from Vec import Vec, dot
 from math import sqrt, cos, sin, pi
 import numpy as np
+from numpy.linalg import inv
 
 
 class Matrix:
@@ -48,17 +49,40 @@ class Matrix:
     def transpose(self):
         return Matrix(np.transpose(self.mat))
 
+    def invert(self):
+        return Matrix(inv(self.mat))
+
+    @classmethod
+    def id(cls, size):
+        m = [[0]*size]*size
+        for i in range(size):
+            m[i][i] = 1
+        return cls(np.array(m))
+
+    @classmethod
+    def translate(cls, x, y, z):
+        return cls(1, 0, 0, x,
+                   0, 1, 0, y,
+                   0, 0, 1, z,
+                   0, 0, 0, 1)
+
     @classmethod
     def rotation_x(cls, theta):
-        return cls(1, 0, 0, 0, cos(theta), -sin(theta), 0, sin(theta), cos(theta))
+        return cls(1, 0, 0,
+                   0, cos(theta), -sin(theta),
+                   0, sin(theta), cos(theta))
 
     @classmethod
     def rotation_y(cls, theta):
-        return cls(cos(theta), 0, sin(theta), 0, 1, 0, -sin(theta), 0, cos(theta))
+        return cls(cos(theta), 0, sin(theta),
+                   0, 1, 0,
+                   -sin(theta), 0, cos(theta))
 
     @classmethod
     def rotation_z(cls, theta):
-        return cls(cos(theta), sin(theta), 0, -sin(theta), cos(theta), 0, 0, 0, 1)
+        return cls(cos(theta), sin(theta), 0,
+                   -sin(theta), cos(theta), 0,
+                   0, 0, 1)
 
 
 if __name__ == "__main__":

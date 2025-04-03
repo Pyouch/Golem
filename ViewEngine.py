@@ -1,3 +1,5 @@
+import Matrix
+
 import Light
 from Light import *
 from Matrix import *
@@ -47,10 +49,16 @@ class ViewEngine:
             self.base_matrix * Vec(0, 0, 1) * self.TILE_SIZE
         ]
         self.screen_size: Vec = Vec(*screen.get_size())
-        self.matrix: Matrix = Matrix(self.base[0]["xyz0"] + Vec(0, 0, 0, self.screen_size.x / 2),
-                                     self.base[1]["xyz0"] + Vec(0, 0, 0, self.screen_size.y / 2),
-                                     self.base[2]["xyz0"],
-                                     Vec(0, 0, 0, 1)).transpose()
+        self.projection_matrix: Matrix = Matrix(self.base[0]["xyz0"] + Vec(0, 0, 0, self.screen_size.x / 2),
+                                                self.base[1]["xyz0"] + Vec(0, 0, 0, self.screen_size.y / 2),
+                                                self.base[2]["xyz0"],
+                                                Vec(0, 0, 0, 1)).transpose()
+        self.cam_matrix = Matrix(1, 0, 0, 0,
+                                 0, 1, 0, 0,
+                                 0, 0, 1, 0,
+                                 0, 0, 0, 1)
+        self.matrix = self.projection_matrix * self.cam_matrix
+        self.invert_cam_matrix = self.cam_matrix.invert()
         self.screen: pg.Surface = screen
 
         self.light_direction: Vec = Vec(1, 1, 1).normalize()
@@ -69,12 +77,12 @@ class ViewEngine:
 
         self.projected_points: dict[Vec, Vec] = {}
 
-    def change_base(self, matrix):
-        self.base_matrix = matrix
-        self.base[0] = self.base_matrix * Vec(1, 0, 0) * 40
-        self.base[1] = self.base_matrix * Vec(0, 1, 0) * 40
-        self.base[2] = self.base_matrix * Vec(0, 0, 1) * 40
-        self.matrix = Matrix(self.base[0], self.base[1], ZERO3).transpose()
+    def move(self, x, y, z):
+        self.cam_matrix = Matrix.translate(x, y, z) * self.cam_matrix
+        self.invert_cam_matrix = self.cam_matrix.invert()
+        self.matrix = self.projection_matrix * self.cam_matrix
+        for plan in self.vision_delimiter_plans:
+            plan.apply_matrix(self.invert_cam_matrix, self.cam_matrix.transpose())
 
     def set_light_direction(self, v: Vec):
         assert v.dim() == 3
