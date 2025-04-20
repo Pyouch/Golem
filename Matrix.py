@@ -1,4 +1,4 @@
-from Vec import Vec, dot
+from Vec import *
 from math import sqrt, cos, sin, pi
 import numpy as np
 from numpy.linalg import inv
@@ -29,7 +29,6 @@ class Matrix:
             size = len(args)
             self.mat = np.array(args)
             self.mat.shape = (size, size)
-            
 
     def dim(self):
         return len(self.mat)
@@ -42,6 +41,8 @@ class Matrix:
         elif isinstance(other, Vec):
             res = np.dot(self.mat, other.get().transpose())
             return Vec(res)
+        elif isinstance(other, float) or isinstance(other, int):
+            return Matrix(self.mat * other)
 
     def __str__(self):
         return str(self.mat)
@@ -54,7 +55,7 @@ class Matrix:
 
     @classmethod
     def id(cls, size):
-        m = [[0]*size]*size
+        m = [[0]*size for _ in range(size)]
         for i in range(size):
             m[i][i] = 1
         return cls(np.array(m))

@@ -37,10 +37,10 @@ def run(nb_times=-1):
     colors = [[Vec(20, 255, 20) for _ in range(len(heights[i]))] for i in range(len(heights))]
     view = View(heights, colors)
     clock = pg.time.Clock()
+    # view.engine.move(-20, -20, 0)
 
     h = 0
     while not inputs.quit and nb_times != 0:
-        view.engine.move(-0.1, -0.1, 0)
         view.bg()
         inputs.update()
         view.draw_terrain()
@@ -54,6 +54,14 @@ def run(nb_times=-1):
             view.engine.lights[0].pos += Vec(-0.5, -0.5, 0) * 1 / 2
         if inputs.holding(pg.K_DOWN):
             view.engine.lights[0].pos += Vec(0.5, 0.5, 0) * 1 / 2
+        if inputs.holding(pg.K_z):
+            view.engine.move(0.1, 0.1, 0)
+        if inputs.holding(pg.K_s):
+            view.engine.move(-0.1, -0.1, 0)
+        if inputs.holding(pg.K_d):
+            view.engine.move(-0.1, 0.1, 0)
+        if inputs.holding(pg.K_q):
+            view.engine.move(0.1, -0.1, 0)
         if inputs.holding(pg.K_SPACE):
             view.engine.lights[0].pos += Vec(0, 0, -0.5) * 1 / 2
         if inputs.holding(pg.K_LSHIFT):

@@ -1,6 +1,5 @@
 import Matrix
 
-import Light
 from Light import *
 from Matrix import *
 from Model3D import *
@@ -64,7 +63,7 @@ class ViewEngine:
         self.light_direction: Vec = Vec(1, 1, 1).normalize()
         self.light_color: Vec = Vec(1, 1, 0.9)
 
-        self.lights: list[Light] = []
+        self.lights = []
 
         self.to_draw_buffer: list[tuple[int, Primitive3D]] = []
 
@@ -83,6 +82,7 @@ class ViewEngine:
         self.matrix = self.projection_matrix * self.cam_matrix
         for plan in self.vision_delimiter_plans:
             plan.apply_matrix(self.invert_cam_matrix, self.cam_matrix.transpose())
+        self.projected_points = {}
 
     def set_light_direction(self, v: Vec):
         assert v.dim() == 3
@@ -156,8 +156,6 @@ class ViewEngine:
 
     def finalize(self):
         self.draw_buffer()
-        self.projected_points = {}
-        # TODO: clear les projected_points lorsqu'on modifie la caméra
 
 
 if __name__ == "__main__":

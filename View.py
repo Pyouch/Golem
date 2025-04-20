@@ -12,10 +12,21 @@ class View:
         self.engine.add_point_light(Vec(5, 5, -3), Vec(1, 1, 1), 5)
         self.engine.set_light_color(Vec(0.2, 0.2, 0.2))
         self.terrain = self.terrain_model(heights, colors)
+        self.cube = self.cube_model()
 
     def bg(self):
         """ Fill the screen in black """
         self.screen.fill(0)
+
+    def cube_model(self):
+        res = Model3D()
+        res.add(Quad3D(Vec(-1, -1, -1),
+                       Vec(1, -1, -1),
+                       Vec(1, 1, -1),
+                       Vec(-1, 1, -1),
+                       Vec(0, 0, 255)))
+        res.finalize()
+        return res
 
     def terrain_model(self, heights, colors):
         """ Create a model 3D representing the terrain"""
@@ -44,6 +55,8 @@ class View:
     def draw_terrain(self):
         """ Draw a terrain described by the relief of the terrain and the colors of the cases """
         self.engine.add_buffer(self.terrain)
+        self.engine.add_buffer(self.cube)
+
         for light in self.engine.lights:
             self.engine.add_buffer(point_3d(light.pos))
 

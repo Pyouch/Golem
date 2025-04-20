@@ -1,4 +1,5 @@
 from GraphicPrimitives import *
+from Matrix import *
 
 
 class Primitive3D:
@@ -23,6 +24,27 @@ class Primitive3D:
     def finalize(self):
         pass
 
+    def translate(self, vec):
+        self.pos += vec
+
+    def rotateX(self, angle):
+        self.apply_matrix_3x3(Matrix.rotation_x(angle))
+
+    def rotateY(self, angle):
+        self.apply_matrix_3x3(Matrix.rotation_y(angle))
+
+    def rotateZ(self, angle):
+        self.apply_matrix_3x3(Matrix.rotation_z(angle))
+
+    def scale(self, nb):
+        self.apply_matrix_3x3(Matrix.id(3) * nb)
+
+    def apply_matrix_3x3(self, mat):
+        self.pos = mat * self.pos
+
+    def apply_matrix_4x4(self, mat):
+        self.pos = (mat * self.pos.add_dim(1)).remove_dim()
+
 
 class Point3D(Primitive3D):
     def __init__(self, pos: Vec, color: Vec):
@@ -37,7 +59,7 @@ class Quad3D(Primitive3D):
     def __init__(self, v1, v2, v3, v4, color):
         pos = (v1 + v2 + v3 + v4) / 4
         super().__init__(pos, max(dist(pos, v1), dist(pos, v2), dist(pos, v3), dist(pos, v4)))
-        self.corners = v1, v2, v3, v4
+        self.corners = [v1, v2, v3, v4]
         self.color = color
 
     def to_2d(self, engine):
@@ -48,6 +70,21 @@ class Quad3D(Primitive3D):
                       engine.color(self.pos, cross(self.corners[0] - self.corners[1],
                                                    self.corners[0] - self.corners[2]),
                                    self.color))
+
+    def translate(self, vec):
+        super().translate(vec)
+        for i in range(len(self.corners)):
+            self.corners[i] += vec
+
+    def apply_matrix_3x3(self, mat):
+        super().apply_matrix_3x3(mat)
+        for i in range(len(self.corners)):
+            self.corners[i] = mat * self.corners[i]
+
+    def apply_matrix_4x4(self, mat):
+        super().apply_matrix_4x4(mat)
+        for i in range(len(self.corners)):
+            self.corners[i] = (mat * self.corners[i].add_dim(1)).remove_dim()
 
 
 class Model3D(Primitive3D):
@@ -86,3 +123,18 @@ class Model3D(Primitive3D):
 
     def splittable(self):
         return True
+
+    def translate(self, vec):
+        super().translate(vec)
+        for p in self.primitives:
+            p.translate(vec)
+
+    def apply_matrix_3x3(self, mat):
+        super().apply_matrix_3x3(mat)
+        for p in self.primitives:
+            p.apply_matrix_3x3(mat)
+
+    def apply_matrix_4x4(self, mat):
+        super().apply_matrix_4x4(mat)
+        for p in self.primitives:
+            p.apply_matrix_4x4(mat)
