@@ -129,7 +129,7 @@ class Vec:
         return Vec(self.y, -self.x)
     
     def add_dim(self, comp=0):
-        """Add a dimension to the vector with the composant 0 if not presized"""
+        """Add a dimension to the vector with the composant 0 if not specified"""
         return Vec(np.append(self.v, comp))
 
     def remove_dim(self, nb_dims=1):
@@ -179,11 +179,7 @@ FORWARD3 = Vec(0, 1, 0)
 BACKWARD3 = Vec(0, -1, 0)
 
 if __name__ == "__main__":
-    test = Vec(2,3)
-    #print(test.dim())
+    test = Vec(2, 3)
     test.add_dim(1)
-    #print(test.dim(), test)
-    #test.remove_dim()
-    #print(test.dim(), test)
     print(dot(test, test))
     

@@ -1,42 +1,11 @@
-from Matrix import *
+import Matrix
+
 from Light import *
-from GraphicPrimitives import *
+from Matrix import *
+from Model3D import *
 from Plan import *
-
-
-class Primitive3D:
-    def __init__(self, pos, size=0):
-        """
-        :param pos: The position of the middle of the primitive
-        :param size: The distance between the position and the most far point of
-        the primitive.
-        """
-        self.pos = pos
-        self.size = size
-
-
-class Point3D(Primitive3D):
-    def __init__(self, pos: Vec, color: Vec):
-        super().__init__(pos)
-        self.color = color
-
-    def to_2d(self, engine):
-        return Point2D(engine.to_screen(self.pos), self.color)
-
-
-class Quad3D(Primitive3D):
-    def __init__(self, v1, v2, v3, v4, color):
-        pos = (v1 + v2 + v3 + v4) / 4
-        super().__init__(pos, max(dist(pos, v1), dist(pos, v2), dist(pos, v3), dist(pos, v4)))
-        self.corners = v1, v2, v3, v4
-        self.color = color
-
-    def to_2d(self, engine):
-        return Quad2D(engine.to_screen(self.corners[0]),
-                      engine.to_screen(self.corners[1]),
-                      engine.to_screen(self.corners[2]),
-                      engine.to_screen(self.corners[3]),
-                      engine.color(self.pos, cross(self.corners[0] - self.corners[1], self.corners[0] - self.corners[2]), self.color))
+from Projector import Projector
+from Lighting import Lighting
 
 
 def point_3d(vec, color=Vec(255, 255, 255)):
@@ -75,40 +44,46 @@ class ViewEngine:
     TILE_SIZE = 40
 
     def __init__(self, screen: pg.Surface):
-        self.base = [
+        self.base: list[Vec] = [
             self.base_matrix * Vec(1, 0, 0) * self.TILE_SIZE,
             self.base_matrix * Vec(0, 1, 0) * self.TILE_SIZE,
             self.base_matrix * Vec(0, 0, 1) * self.TILE_SIZE
         ]
-        self.screen_size = Vec(*screen.get_size())
-        self.matrix = Matrix(self.base[0]["xyz0"]+Vec(0, 0, 0, self.screen_size.x/2),
-                             self.base[1]["xyz0"]+Vec(0, 0, 0, self.screen_size.y/2),
-                             self.base[2]["xyz0"],
-                             Vec(0, 0, 0, 1)).transpose()
-        self.screen = screen
+        self.screen_size: Vec = Vec(*screen.get_size())
+        self.projection_matrix: Matrix = Matrix(self.base[0]["xyz0"] + Vec(0, 0, 0, self.screen_size.x / 2),
+                                                self.base[1]["xyz0"] + Vec(0, 0, 0, self.screen_size.y / 2),
+                                                self.base[2]["xyz0"],
+                                                Vec(0, 0, 0, 1)).transpose()
+        self.cam_matrix = Matrix(1, 0, 0, 0,
+                                 0, 1, 0, 0,
+                                 0, 0, 1, 0,
+                                 0, 0, 0, 1)
+        self.projector = Projector(self.projection_matrix * self.cam_matrix)
+        self.invert_cam_matrix = self.cam_matrix.invert()
+        self.screen: pg.Surface = screen
 
-        self.light_direction = Vec(1, 1, 1).normalize()
-        self.light_color = Vec(1, 1, 0.9)
+        self.lighting = Lighting(Vec(1, 1, 1).normalize(), Vec(1, 1, 0.9), self.base[2])
 
         self.lights = []
 
-        self.to_draw_buffer = []
+        self.to_draw_buffer: list[tuple[int, Primitive3D]] = []
 
-        self.vision_delimiter_plans = [
-            Plan(-self.base[0] * self.screen_size[0] / 2 / self.TILE_SIZE**2, self.base[0]),
-            Plan(self.base[0] * self.screen_size[0] / 2 / self.TILE_SIZE**2, -self.base[0]),
-            Plan(-self.base[1] * self.screen_size[1] / 2 / self.TILE_SIZE**2, self.base[1]),
-            Plan(self.base[1] * self.screen_size[1] / 2 / self.TILE_SIZE**2, -self.base[1])
+        self.vision_delimiter_plans: list[Plan] = [
+            Plan(-self.base[0] * self.screen_size[0] / 2 / self.TILE_SIZE ** 2, self.base[0]),
+            Plan(self.base[0] * self.screen_size[0] / 2 / self.TILE_SIZE ** 2, -self.base[0]),
+            Plan(-self.base[1] * self.screen_size[1] / 2 / self.TILE_SIZE ** 2, self.base[1]),
+            Plan(self.base[1] * self.screen_size[1] / 2 / self.TILE_SIZE ** 2, -self.base[1])
         ]
 
-        self.projected_points = {}
+        self.projected_points: dict[Vec, Vec] = {}
 
-    def change_base(self, matrix):
-        self.base_matrix = matrix
-        self.base[0] = self.base_matrix * Vec(1, 0, 0) * 40
-        self.base[1] = self.base_matrix * Vec(0, 1, 0) * 40
-        self.base[2] = self.base_matrix * Vec(0, 0, 1) * 40
-        self.matrix = Matrix(self.base[0], self.base[1], ZERO3).transpose()
+    def move(self, x, y, z):
+        self.cam_matrix = Matrix.translate(x, y, z) * self.cam_matrix
+        self.invert_cam_matrix = self.cam_matrix.invert()
+        self.projector.set_matrix(self.projection_matrix * self.cam_matrix)
+        for plan in self.vision_delimiter_plans:
+            plan.apply_matrix(self.invert_cam_matrix, self.cam_matrix.transpose())
+        self.projected_points = {}
 
     def set_light_direction(self, v: Vec):
         assert v.dim() == 3
@@ -122,6 +97,7 @@ class ViewEngine:
         self.lights.append(PointLight(pos, color, power))
 
     def to_screen(self, v):
+        assert False, "Huston Huston, we got a problem"
         if v in self.projected_points:
             return self.projected_points[v]
         else:
@@ -131,8 +107,6 @@ class ViewEngine:
 
     def cam_dist(self, pos):
         return dot(pos, self.base[2])
-
-
 
     def color(self, pos, normal, color):
         return self._intensity(pos, normal) * color
@@ -161,23 +135,38 @@ class ViewEngine:
         :return: Si elle a été ajoutée ou pas (Peut ne pas être ajoutée si la
         primitive n'est pas visible)
         """
+        min_p = 1
         for plan in self.vision_delimiter_plans:
-            if not plan.in_normal_dir(elt.pos, elt.size):
+            p = plan.in_normal_dir(elt.pos, elt.size)
+            if p == -1:
                 return False
+            elif p == 0:
+                min_p = 0
+        if min_p == 0 and elt.splittable():
+            for e in elt.split():
+                self.add_buffer(e)
+            return True
         key = self.cam_dist(elt.pos)
         self.to_draw_buffer.append((key, elt))
         return True
 
     def draw_buffer(self):
         self.to_draw_buffer.sort(reverse=True, key=lambda e: e[0])
+        primitives_2d = []
+        vertices_3d = []
+        col_infos = []
         for _, primitive in self.to_draw_buffer:
-            primitive.to_2d(self).draw(self.screen)
+            primitives_2d.append(primitive.to_2d(self, vertices_3d, col_infos))
+        vertices_2d = self.projector.project(vertices_3d)
+        colors = self.lighting.lighting(col_infos, self.lights)
+        for primitive in primitives_2d:
+            primitive.complete(vertices_2d, colors)
+        for primitive in primitives_2d:
+            primitive.draw(self.screen)
         self.to_draw_buffer = []
 
     def finalize(self):
         self.draw_buffer()
-        self.projected_points = {}
-        # TODO: clear les projected_points lorsqu'on modifie la caméra
 
 
 if __name__ == "__main__":
