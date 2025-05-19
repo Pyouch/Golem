@@ -4,6 +4,8 @@ from Light import *
 from Matrix import *
 from Model3D import *
 from Plan import *
+from Projector import Projector
+from Lighting import Lighting
 
 
 def point_3d(vec, color=Vec(255, 255, 255)):
@@ -56,12 +58,11 @@ class ViewEngine:
                                  0, 1, 0, 0,
                                  0, 0, 1, 0,
                                  0, 0, 0, 1)
-        self.matrix = self.projection_matrix * self.cam_matrix
+        self.projector = Projector(self.projection_matrix * self.cam_matrix)
         self.invert_cam_matrix = self.cam_matrix.invert()
         self.screen: pg.Surface = screen
 
-        self.light_direction: Vec = Vec(1, 1, 1).normalize()
-        self.light_color: Vec = Vec(1, 1, 0.9)
+        self.lighting = Lighting(Vec(1, 1, 1).normalize(), Vec(1, 1, 0.9), self.base[2])
 
         self.lights = []
 
@@ -79,7 +80,7 @@ class ViewEngine:
     def move(self, x, y, z):
         self.cam_matrix = Matrix.translate(x, y, z) * self.cam_matrix
         self.invert_cam_matrix = self.cam_matrix.invert()
-        self.matrix = self.projection_matrix * self.cam_matrix
+        self.projector.set_matrix(self.projection_matrix * self.cam_matrix)
         for plan in self.vision_delimiter_plans:
             plan.apply_matrix(self.invert_cam_matrix, self.cam_matrix.transpose())
         self.projected_points = {}
@@ -96,6 +97,7 @@ class ViewEngine:
         self.lights.append(PointLight(pos, color, power))
 
     def to_screen(self, v):
+        assert False, "Huston Huston, we got a problem"
         if v in self.projected_points:
             return self.projected_points[v]
         else:
@@ -150,8 +152,17 @@ class ViewEngine:
 
     def draw_buffer(self):
         self.to_draw_buffer.sort(reverse=True, key=lambda e: e[0])
+        primitives_2d = []
+        vertices_3d = []
+        col_infos = []
         for _, primitive in self.to_draw_buffer:
-            primitive.to_2d(self).draw(self.screen)
+            primitives_2d.append(primitive.to_2d(self, vertices_3d, col_infos))
+        vertices_2d = self.projector.project(vertices_3d)
+        colors = self.lighting.lighting(col_infos, self.lights)
+        for primitive in primitives_2d:
+            primitive.complete(vertices_2d, colors)
+        for primitive in primitives_2d:
+            primitive.draw(self.screen)
         self.to_draw_buffer = []
 
     def finalize(self):

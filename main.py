@@ -37,7 +37,7 @@ def run(nb_times=-1):
     colors = [[Vec(20, 255, 20) for _ in range(len(heights[i]))] for i in range(len(heights))]
     view = View(heights, colors)
     clock = pg.time.Clock()
-    # view.engine.move(-20, -20, 0)
+    view.engine.move(-20, -20, 0)
 
     h = 0
     while not inputs.quit and nb_times != 0:

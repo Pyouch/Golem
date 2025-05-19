@@ -12,7 +12,7 @@ class Primitive3D:
         self.pos = pos
         self.size = size
 
-    def to_2d(self, engine) -> Primitive2D:
+    def to_2d(self, engine, vertices: list[Vec], col_infos: list[tuple[Vec, Vec, Vec]]) -> Primitive2D:
         pass
 
     def split(self):
@@ -51,8 +51,9 @@ class Point3D(Primitive3D):
         super().__init__(pos)
         self.color = color
 
-    def to_2d(self, engine):
-        return Point2D(engine.to_screen(self.pos), self.color)
+    def to_2d(self, engine, vertices, col_infos):
+        vertices.append(self.pos)
+        return Point2D(len(vertices)-1, self.color)
 
 
 class Quad3D(Primitive3D):
@@ -62,14 +63,14 @@ class Quad3D(Primitive3D):
         self.corners = [v1, v2, v3, v4]
         self.color = color
 
-    def to_2d(self, engine):
-        return Quad2D(engine.to_screen(self.corners[0]),
-                      engine.to_screen(self.corners[1]),
-                      engine.to_screen(self.corners[2]),
-                      engine.to_screen(self.corners[3]),
-                      engine.color(self.pos, cross(self.corners[0] - self.corners[1],
-                                                   self.corners[0] - self.corners[2]),
-                                   self.color))
+    def to_2d(self, engine, vertices, col_infos):
+        for corner in self.corners:
+            vertices.append(corner)
+        col_infos.append((self.pos, cross(self.corners[0] - self.corners[1],
+                                          self.corners[0] - self.corners[2]),
+                          self.color))
+        return Quad2D(len(vertices)-4, len(vertices)-3, len(vertices)-2, len(vertices)-1,
+                      len(col_infos)-1)
 
     def translate(self, vec):
         super().translate(vec)
@@ -111,11 +112,11 @@ class Model3D(Primitive3D):
             if d > self.size:
                 self.size = d
 
-    def to_2d(self, engine):
+    def to_2d(self, engine, vertices, col_infos):
         assert self.finalized, "Il faut appeler la methode finalize() avant de dessiner le modèle"
         res = Container()
         for primitive in self.primitives:
-            res.add(primitive.to_2d(engine))
+            res.add(primitive.to_2d(engine, vertices, col_infos))
         return res
 
     def split(self):
